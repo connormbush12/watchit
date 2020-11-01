@@ -1,0 +1,35 @@
+#!/usr/bin/env node
+
+const debounce = require('lodash.debounce');
+const chokidar = require('chokidar');
+
+//First, we have to go to the terminal and install caporal by stating 'npm install caporal'
+//Then, we require it. We name it program because that's what the documentation uses on their site
+const program = require('caporal');
+
+//Now, we use the documentation they have
+//First, we define a version. This doesn't effect the quality of our code, rather it's just for extra info
+//Then, we tack on a .argument. This tells the program what argument it needs to accept. Within argument, we have two parameters. /
+//The first is the argument we want. In this case, we want a file name. By wrapping it in [], we make it optional. To make it required, we wrap it in <>
+//The second parameter is the instructions we provide the user
+//Then, we use a .action, which accepts a callback function and does whatever you need it to based on the inputs
+program.version('0.0.1').argument('[ filename ]', 'Name of a file to execute').action((args) => {
+	console.log(args);
+});
+
+//Finally, we have to parse the program. process.argv returns an array containing the command line arguments passed when the Node.js process was launched
+program.parse(process.argv);
+
+const start = debounce(() => {
+	console.log('STARTED USERS PROGRAM');
+}, 100);
+
+chokidar
+	.watch('.')
+	.on('all', start)
+	.on('change', () => {
+		console.log('FILE CHANGED');
+	})
+	.on('unlink', () => {
+		console.log('FILE UNLINKED');
+	});
